@@ -7,6 +7,7 @@ import skyui.components.list.ListLayoutManager;
 import skyui.components.list.TabularList;
 import skyui.components.list.ListLayout;
 import skyui.components.ButtonPanel;
+import skyui.filter.ItemTypeFilter;
 import skyui.util.ConfigManager;
 import skyui.util.Debug;
 import skyui.util.GlobalFunctions;
@@ -66,6 +67,7 @@ class CraftingMenu extends MovieClip
 
 	private var _handleInputRateLimiter: Boolean;
 	private var _VRInput: VRInput;
+	private var _showEffectsList: Boolean = false;
 
 	private var vrActionConditions = undefined;
 
@@ -226,7 +228,7 @@ class CraftingMenu extends MovieClip
 	// @API - Alchemy
 	public function SetPartitionedFilterMode(a_bPartitioned: Boolean): Void
 	{
-		CategoryList.setPartitionedFilterMode(a_bPartitioned);
+		CategoryList.setFilterMode(ItemTypeFilter.MODE_PARTITIONED);
 	}
 
 	// @API - Alchemy
@@ -284,16 +286,6 @@ class CraftingMenu extends MovieClip
 	// @API
 	public function UpdateItemList(abFullRebuild: Boolean): Void
 	{
-		if (_subtypeName == "ConstructibleObject") {
-			// After constructing an item, the native control flow is:
-			//    (1) Call InvalidateListData directly and set some basic data
-			//	  (2) Call UpdateItemList(false) to set more stuff
-			//
-			// The problem is that enabled is only set in (2), so we always do a full rebuild not to screw up our sorting.
-			// For this menu, this is not a problem. For others it would be (recursive calls to UpdateItemList).
-			abFullRebuild = true;
-		}
-
 		if (abFullRebuild == true) {
 			CategoryList.InvalidateListData();
 		} else {
@@ -602,9 +594,12 @@ class CraftingMenu extends MovieClip
 
 		} else if (_subtypeName == "ConstructibleObject") {
 			layout = ListLayoutManager.createLayout(a_config["ListLayout"], "ConstructListLayout");
+			_showEffectsList = true;
+			layout.entryWidth -= CraftingLists.SHORT_LIST_OFFSET;
 
 		} else /*if (_subtypeName == "Alchemy")*/ {
 			layout = ListLayoutManager.createLayout(a_config["ListLayout"], "AlchemyListLayout");
+			_showEffectsList = true;
 			layout.entryWidth -= CraftingLists.SHORT_LIST_OFFSET;
 		}
 
@@ -619,6 +614,21 @@ class CraftingMenu extends MovieClip
 
 		_searchKey = a_config["Input"].controls.pc.search;
 		_searchControls = {keyCode: _searchKey};
+	}
+
+	private function setEffectsListVisible(a_visible: Boolean): Void
+	{
+		if (_showEffectsList == a_visible)
+			return;
+
+		_showEffectsList = a_visible;
+
+		if (a_visible) {
+			ItemList.layout.entryWidth -= CraftingLists.SHORT_LIST_OFFSET;
+		}
+		else {
+			ItemList.layout.entryWidth += CraftingLists.SHORT_LIST_OFFSET;
+		}
 	}
 
 	private function onItemListPressed(event: Object): Void
