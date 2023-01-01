@@ -265,6 +265,16 @@ class CraftingMenu extends MovieClip
 	// @API
 	public function UpdateItemList(abFullRebuild: Boolean): Void
 	{
+		if (_subtypeName == "ConstructibleObject") {
+			// After constructing an item, the native control flow is:
+			//    (1) Call InvalidateListData directly and set some basic data
+			//	  (2) Call UpdateItemList(false) to set more stuff
+			//
+			// The problem is that enabled is only set in (2), so we always do a full rebuild not to screw up our sorting.
+			// For this menu, this is not a problem. For others it would be (recursive calls to UpdateItemList).
+			abFullRebuild = true;
+		}
+
 		if (abFullRebuild == true) {
 			CategoryList.InvalidateListData();
 		} else {
