@@ -123,6 +123,24 @@ class CraftingDataSetter implements IListProcessor
 				processSoulGemStatus(a_entryObject);
 				processSoulGemBaseId(a_entryObject);
 				break;
+
+			case Form.TYPE_SPELL:
+				a_entryObject.infoCastLevel = a_entryObject.castLevel;
+				a_entryObject.infoSchoolName = a_entryObject.magicSchoolName;
+				
+				// 0 -> "-"
+				a_entryObject.duration = (a_entryObject.duration > 0) ? (Math.round(a_entryObject.duration * 100) / 100) : null;
+				a_entryObject.magnitude = (a_entryObject.magnitude > 0) ? (Math.round(a_entryObject.magnitude * 100) / 100) : null;
+				
+				var spellCost = a_entryObject.spellCost;
+				a_entryObject.infoSpellCost = spellCost;
+			
+				if (spellCost != 0 && a_entryObject.castTime == 0)
+					a_entryObject.spellCostDisplay = spellCost + "/s";
+				else
+					a_entryObject.spellCostDisplay = spellCost;
+				
+				break;
 		}
 	}
 

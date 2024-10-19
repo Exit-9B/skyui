@@ -88,6 +88,10 @@ class CraftingIconSetter implements IListProcessor
 			case Form.TYPE_ENCHANTMENT:
 				a_entryObject.iconLabel = "default_effect";
 				break;
+				
+			case Form.TYPE_SPELL:
+				processSpellIcon(a_entryObject);
+				break;
 		}
 
 		if (_noIconColors && a_entryObject.iconColor != undefined)
@@ -591,6 +595,35 @@ class CraftingIconSetter implements IListProcessor
 			case Item.MISC_HOUSEPART:
 				break;
 			*/
+		}
+	}
+
+	private function processSpellIcon(a_entryObject: Object): Void
+	{
+		a_entryObject.iconLabel = "default_power";
+		switch(a_entryObject.school)
+		{
+			case Actor.AV_ALTERATION:
+				a_entryObject.iconLabel = "default_alteration";
+				break;
+
+			case Actor.AV_CONJURATION:
+				a_entryObject.iconLabel = "default_conjuration";
+				break;
+
+			case Actor.AV_DESTRUCTION:
+				a_entryObject.iconLabel = "default_destruction";
+				processResist(a_entryObject);
+				break;
+
+			case Actor.AV_ILLUSION:
+				a_entryObject.iconLabel = "default_illusion";
+				break;
+
+			case Actor.AV_RESTORATION:
+				a_entryObject.iconLabel = "default_restoration";
+				break;
+
 		}
 	}
 
