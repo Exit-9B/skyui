@@ -118,6 +118,29 @@ class CraftingIconSetter implements IListProcessor
 		}
 	}
 
+	private function processSpellResist(a_entryObject: Object): Void
+	{
+		if (a_entryObject.resistance == undefined || a_entryObject.resistance == Actor.AV_NONE)
+			return;
+
+		switch(a_entryObject.resistance) {
+			case Actor.AV_FIRERESIST:
+				a_entryObject.iconLabel = "magic_fire";
+				a_entryObject.iconColor = 0xC73636;
+				break;
+
+			case Actor.AV_ELECTRICRESIST:
+				a_entryObject.iconLabel = "magic_shock";
+				a_entryObject.iconColor = 0xEAAB00;
+				break;
+
+			case Actor.AV_FROSTRESIST:
+				a_entryObject.iconLabel = "magic_frost";
+				a_entryObject.iconColor = 0x1FFBFF;
+				break;
+		}
+	}
+
 	private function processArmorIcon(a_entryObject: Object): Void
 	{
 		a_entryObject.iconLabel = "default_armor";
@@ -613,7 +636,7 @@ class CraftingIconSetter implements IListProcessor
 
 			case Actor.AV_DESTRUCTION:
 				a_entryObject.iconLabel = "default_destruction";
-				processResist(a_entryObject);
+				processSpellResist(a_entryObject);
 				break;
 
 			case Actor.AV_ILLUSION:
