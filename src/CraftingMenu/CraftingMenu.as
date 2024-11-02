@@ -19,6 +19,7 @@ class CraftingMenu extends MovieClip
 	
   /* CONSTANTS */
 	
+	static var INITIAL_ASPECT_RATIO: Number = 16 / 9;
 	static var LIST_OFFSET: Number = 20;
 	static var SELECT_BUTTON: Number = 0;
 	static var EXIT_BUTTON: Number = 1;
@@ -46,6 +47,8 @@ class CraftingMenu extends MovieClip
 	
   /* PRIVATE VARIABLES */
   
+	private var _aspectRatio: Number = CraftingMenu.INITIAL_ASPECT_RATIO;
+	
 	private var _bCanCraft: Boolean = false;
 	private var _bCanFadeItemInfo: Boolean = true;
 	private var _bItemCardAdditionalDescription: Boolean = false;
@@ -212,6 +215,7 @@ class CraftingMenu extends MovieClip
 		};
 		
 		bCanCraft = false;
+		GameDelegate.call("GetScreenDimensions", [], this, "setScreenDimensions");
 		positionFixedElements();
 	}
 	
@@ -433,40 +437,61 @@ class CraftingMenu extends MovieClip
 	
   /* PRIVATE FUNCTIONS */
 
+	private function setScreenDimensions(a_width: Number, a_height: Number): Void
+	{
+		Stage.scaleMode = "exactFit";
+		var ratio = a_width / a_height;
+		if (ratio != _aspectRatio) {
+			var xscale = _aspectRatio / ratio;
+			_aspectRatio = ratio;
+			InventoryLists._width *= xscale;
+			MenuDescriptionHolder._width *= xscale;
+			ItemInfoHolder._width *= xscale;
+			MenuNameHolder._width *= xscale;
+			BottomBarInfo.playerInfoCard._width *= xscale;
+			BottomBarInfo.buttonPanel._width *= xscale;
+			ExitMenuRect._width *= xscale;
+			//MouseRotationRect._width *= xscale;
+		}
+	}
+	
 	private function positionFixedElements(): Void
 	{
 		GlobalFunc.SetLockFunction();
 		
+		var xscale = CraftingMenu.INITIAL_ASPECT_RATIO / _aspectRatio;
+		
 		MovieClip(CategoryList).Lock("L");
-		CategoryList._x = CategoryList._x - CraftingMenu.LIST_OFFSET;
+		CategoryList._x = CategoryList._x - CraftingMenu.LIST_OFFSET * xscale;
 		
 		MenuNameHolder.Lock("L");
-		MenuNameHolder._x = MenuNameHolder._x - CraftingMenu.LIST_OFFSET;
+		MenuNameHolder._x = MenuNameHolder._x - CraftingMenu.LIST_OFFSET * xscale;
 		MenuDescriptionHolder.Lock("TR");
 		var leftOffset: Number = Stage.visibleRect.x + Stage.safeRect.x;
 		var rightOffset: Number = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
 		
 		var a = CategoryList.getContentBounds();
 		// 25 is hardcoded cause thats the final offset after the animation of the panel container is done
-		var panelEdge = CategoryList._x + a[0] + a[2] + 25;
+		var panelEdge = CategoryList._x + (a[0] + a[2] + 25) * xscale;
 		
-		MenuDescriptionHolder._x = 10 + panelEdge + ((rightOffset - panelEdge) / 2) + (MenuDescriptionHolder._width / 2);
+		MenuDescriptionHolder._x = 10 * xscale + panelEdge + ((rightOffset - panelEdge) / 2) + (MenuDescriptionHolder._width / 2);
 
 		BottomBarInfo.positionElements(leftOffset, rightOffset);
 	
 		MovieClip(ExitMenuRect).Lock("TL");
-		ExitMenuRect._x = ExitMenuRect._x - (Stage.safeRect.x + 10);
+		ExitMenuRect._x = ExitMenuRect._x - (Stage.safeRect.x + 10 * xscale);
 		ExitMenuRect._y = ExitMenuRect._y - Stage.safeRect.y;
 	}
 	
 	private function positionFloatingElements(): Void
 	{
+		var xscale = CraftingMenu.INITIAL_ASPECT_RATIO / _aspectRatio;
 		var leftEdge = Stage.visibleRect.x + Stage.safeRect.x;
 		var rightEdge = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
 		
 		var a = CategoryList.getContentBounds();
 		// 25 is hardcoded cause thats the final offset after the animation of the panel container is done
-		var panelEdge = CategoryList._x + a[0] + a[2] + 25;
+		var panelEdge = CategoryList._x + (a[0] + a[2] + 25) * xscale;
 
 		var itemCardContainer = ItemInfo._parent;
 		var itemcardPosition = _config.ItemInfo.itemcard;
@@ -479,6 +504,8 @@ class CraftingMenu extends MovieClip
 			itemCardWidth = ItemInfo.background._width;
 		else
 			itemCardWidth = ItemInfo._width;
+		
+		itemCardWidth *= xscale;
 		
 		// For some reason the container is larger than the card
 		// Card x is at 0 so we can use the inner width without adjustment
